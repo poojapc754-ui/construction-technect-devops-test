@@ -39,7 +39,8 @@ jobs:
 
       - name: Run Tests
         run: pytest test_app.py -v
-        build:
+
+  build:
     needs: test
     runs-on: ubuntu-latest
     steps:
