@@ -85,3 +85,30 @@ jobs:
 
       - name: Check App Logs (proof it ran)
         run: docker logs construction-app
+
+  monitor:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t construction-technect-app:latest .
+
+      - name: Run Container Again (simulating live production)
+        run: docker run -d --name monitored-app construction-technect-app:latest
+
+      - name: Health Check - Is Container Running?
+        run: |
+          echo "Running health check..."
+          STATUS=$(docker inspect -f '{{.State.Running}}' monitored-app || echo "false")
+          if [ "$STATUS" = "true" ]; then
+            echo "✅ App is healthy and running"
+          else
+            echo "❌ App is NOT running - alert would be sent here"
+            exit 1
+          fi
+
+      - name: Show Final App Output (simulated production logs)
+        run: docker logs monitored-app
