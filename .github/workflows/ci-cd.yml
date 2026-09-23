@@ -65,3 +65,22 @@ jobs:
 
       - name: Confirm image was created
         run: docker images
+        deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t construction-technect-app:latest .
+
+      - name: Simulate Deployment - Run Container
+        run: |
+          echo "Deploying application..."
+          docker run -d --name construction-app construction-technect-app:latest
+          sleep 3
+          docker ps -a
+
+      - name: Check App Logs (proof it ran)
+        run: docker logs construction-app 
