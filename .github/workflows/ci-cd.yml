@@ -39,3 +39,28 @@ jobs:
 
       - name: Run Tests
         run: pytest test_app.py -v
+        build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Confirm build files are ready
+        run: |
+          echo "Checking required files..."
+          test -f app.py && echo "app.py found"
+          test -f Dockerfile && echo "Dockerfile found"
+
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t construction-technect-app:latest .
+
+      - name: Confirm image was created
+        run: docker images
