@@ -1,11 +1,41 @@
-name: My First Pipeline
+name: CI-CD Pipeline
 
 on:
   push:
     branches: [devops-test]
 
 jobs:
-  say-hello:
+  validate:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Hello, this pipeline works!"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install flake8 (code checker)
+        run: pip install flake8
+
+      - name: Run Code Validation
+        run: flake8 app.py test_app.py --max-line-length=100
+
+  test:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Run Tests
+        run: pytest test_app.py -v
