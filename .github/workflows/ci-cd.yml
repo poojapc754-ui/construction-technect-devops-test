@@ -1,0 +1,11 @@
+name: My First Pipeline
+
+on:
+  push:
+    branches: [devops-test]
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Hello, this pipeline works!"
