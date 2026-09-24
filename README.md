@@ -1,7 +1,3 @@
-## Assignment Documents
-- [AWS Architecture Design](./aws%20architecture)
-- [Database Troubleshooting Guide](./troubleshooting)
-- [CI/CD Pipeline Design](./git-workflow)
 
 # Construction Technect — CI/CD Pipeline
 
