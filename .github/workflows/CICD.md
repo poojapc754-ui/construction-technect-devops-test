@@ -1,3 +1,5 @@
+> Note: This workflow file represents the complete CI/CD pipeline design. Since this repository contains only documentation (not the actual application source code), the automated runs fail at the build/test stage as expected — the pipeline structure and logic are what's being demonstrated here.
+
 # CI/CD Pipeline — Construction Technect
 
 ## Pipeline Flow
