@@ -1,3 +1,8 @@
+## Assignment Documents
+- [AWS Architecture Design](./aws%20architecture)
+- [Database Troubleshooting Guide](./troubleshooting)
+- [CI/CD Pipeline Design](./git-workflow)
+
 # Construction Technect — CI/CD Pipeline
 
 This repository contains a working CI/CD (Continuous Integration / Continuous Deployment) pipeline built for Construction Technect's SaaS application, using **GitHub Actions**.
