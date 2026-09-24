@@ -1,0 +1,114 @@
+name: CI-CD Pipeline
+
+on:
+  push:
+    branches: [devops-test]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install flake8 (code checker)
+        run: pip install flake8
+
+      - name: Run Code Validation
+        run: flake8 app.py test_app.py --max-line-length=100
+
+  test:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Run Tests
+        run: pytest test_app.py -v
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Confirm build files are ready
+        run: |
+          echo "Checking required files..."
+          test -f app.py && echo "app.py found"
+          test -f Dockerfile && echo "Dockerfile found"
+
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t construction-technect-app:latest .
+
+      - name: Confirm image was created
+        run: docker images
+
+  deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t construction-technect-app:latest .
+
+      - name: Simulate Deployment - Run Container
+        run: |
+          echo "Deploying application..."
+          docker run -d --name construction-app construction-technect-app:latest
+          sleep 3
+          docker ps -a
+
+      - name: Check App Logs (proof it ran)
+        run: docker logs construction-app
+
+  monitor:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t construction-technect-app:latest .
+
+      - name: Run Container Again (simulating live production)
+        run: docker run -d --name monitored-app construction-technect-app:latest
+
+      - name: Health Check - Is Container Running?
+        run: |
+          echo "Running health check..."
+          STATUS=$(docker inspect -f '{{.State.Running}}' monitored-app || echo "false")
+          if [ "$STATUS" = "true" ]; then
+            echo "✅ App is healthy and running"
+          else
+            echo "❌ App is NOT running - alert would be sent here"
+            exit 1
+          fi
+
+      - name: Show Final App Output (simulated production logs)
+        run: docker logs monitored-app
